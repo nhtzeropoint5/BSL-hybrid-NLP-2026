@@ -1,0 +1,23 @@
+# Datasets and generated sequences (too large for GitHub)
+data/
+
+# Trained model
+models/
+
+# PDFs
+pdf/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+src/__pycache__/
+train/__pycache__/
+
+# Virtual environment
+venv/
+.env/
+
+# IDE
+.vscode/
+.idea/

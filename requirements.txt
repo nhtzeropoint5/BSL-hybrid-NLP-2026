@@ -1,0 +1,11 @@
+# Pinned for Python 3.11 compatibility
+# Install: pip install -r requirements.txt
+
+numpy==1.24.3
+protobuf==3.20.3
+tensorflow==2.13.0
+mediapipe==0.10.9
+opencv-python==4.8.1.78  # use opencv-python-headless==4.8.1.78 on Kaggle/servers
+PyQt5>=5.15.9
+scikit-learn>=1.3.0
+fer==22.5.1
