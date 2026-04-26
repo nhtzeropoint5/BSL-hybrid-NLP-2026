@@ -166,10 +166,14 @@ def main():
         description='Convert Final_Dataset word images to landmark sequences')
     parser.add_argument('--aug', type=int, default=4,
                         help='Augmented copies per image (default: 4)')
+    parser.add_argument('--src', type=str, default=None,
+                        help='Path to Final_Dataset folder (overrides default)')
     args = parser.parse_args()
 
-    if not os.path.isdir(DATASET_DIR):
-        print(f"ERROR: Dataset not found at '{DATASET_DIR}'")
+    dataset_dir = args.src if args.src else DATASET_DIR
+
+    if not os.path.isdir(dataset_dir):
+        print(f"ERROR: Dataset not found at '{dataset_dir}'")
         print("       Expected: data/dataset/Final_Dataset/")
         sys.exit(1)
 
@@ -180,7 +184,7 @@ def main():
         print(f"WARNING: No folder mapping for: {missing}")
 
     print("=== Final_Dataset (102 Words) → Landmark Sequence Converter ===\n")
-    print(f"  Source  : {DATASET_DIR}")
+    print(f"  Source  : {dataset_dir}")
     print(f"  Output  : {OUT_DIR}")
     print(f"  Words   : {len(WORDS)}")
     print(f"  Augment : {args.aug} copies per image\n")
@@ -197,7 +201,7 @@ def main():
             print(f"  '{bangla}' — no folder mapping, skipping.")
             continue
 
-        src_dir = os.path.join(DATASET_DIR, folder_name)
+        src_dir = os.path.join(dataset_dir, folder_name)
         if not os.path.isdir(src_dir):
             print(f"  '{bangla}' — folder not found: {src_dir}, skipping.")
             continue

@@ -1,0 +1,208 @@
+<svg width="880" height="1060" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L0,8 L8,4 z" fill="#64748b"/>
+    </marker>
+    <marker id="arr-pink" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L0,8 L8,4 z" fill="#db2777"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="880" height="1060" fill="#f8fafc"/>
+
+  <!-- Column background hints -->
+  <rect x="50" y="220" width="460" height="660" rx="12" fill="#f0fdf4" opacity="0.5"/>
+  <rect x="530" y="220" width="310" height="360" rx="12" fill="#fdf2f8" opacity="0.5"/>
+
+  <!-- Column labels -->
+  <text x="278" y="216" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" letter-spacing="2">SIGN RECOGNITION PIPELINE</text>
+  <text x="685" y="216" text-anchor="middle" font-size="11" font-weight="bold" fill="#db2777" letter-spacing="2">EMOTION PIPELINE</text>
+
+  <!-- ═══════════════════════════════ TITLE ═══════════════════════════════ -->
+  <text x="440" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f172a">BSL-Hybrid — Real-Time Translation Pipeline</text>
+
+  <!-- ══════════════════════════════ WEBCAM ══════════════════════════════ -->
+  <rect x="300" y="42" width="280" height="50" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="440" y="62" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e40af">📷  Webcam</text>
+  <text x="440" y="80" text-anchor="middle" font-size="11" fill="#1e40af">RGB Frame · 640×480 · 30 FPS</text>
+
+  <!-- Webcam → Frame -->
+  <line x1="440" y1="92" x2="440" y2="115" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ══════════════════════════ FRAME CAPTURE ══════════════════════════ -->
+  <rect x="300" y="115" width="280" height="50" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="440" y="135" text-anchor="middle" font-size="13" font-weight="bold" fill="#065f46">OpenCV Frame Capture</text>
+  <text x="440" y="153" text-anchor="middle" font-size="11" fill="#065f46">Horizontal flip · BGR → RGB conversion</text>
+
+  <!-- Frame → split line -->
+  <line x1="440" y1="165" x2="440" y2="192" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="165" y1="192" x2="650" y2="192" stroke="#64748b" stroke-width="1.5"/>
+  <!-- left branch -->
+  <line x1="270" y1="192" x2="270" y2="228" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- right branch -->
+  <line x1="650" y1="192" x2="650" y2="228" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ══════════════════════════ HAND PIPELINE ══════════════════════════ -->
+  <rect x="155" y="228" width="230" height="52" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="270" y="248" text-anchor="middle" font-size="13" font-weight="bold" fill="#065f46">MediaPipe HandPipeline</text>
+  <text x="270" y="264" text-anchor="middle" font-size="11" fill="#065f46">Hands: 21 lm × 2 + Pose: 33 lm</text>
+  <text x="270" y="278" text-anchor="middle" font-size="10" fill="#065f46">wrist-normalised · shoulder-normalised</text>
+
+  <!-- ══════════════════════════ FACE PIPELINE ══════════════════════════ -->
+  <rect x="540" y="228" width="220" height="52" rx="8" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+  <text x="650" y="248" text-anchor="middle" font-size="13" font-weight="bold" fill="#9d174d">FacePipeline</text>
+  <text x="650" y="264" text-anchor="middle" font-size="11" fill="#9d174d">FER Library</text>
+  <text x="650" y="278" text-anchor="middle" font-size="10" fill="#9d174d">OpenCV Haar Cascade face detector</text>
+
+  <!-- HandPipeline → features -->
+  <line x1="270" y1="280" x2="270" y2="308" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="295" y="298" font-size="10" fill="#64748b">258 features/frame</text>
+
+  <!-- FacePipeline → raw emotion -->
+  <line x1="650" y1="280" x2="650" y2="308" stroke="#db2777" stroke-width="1.5" marker-end="url(#arr-pink)"/>
+
+  <!-- ════════════════════════ 258-DIM FEATURES ════════════════════════ -->
+  <rect x="155" y="308" width="230" height="50" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="270" y="328" text-anchor="middle" font-size="13" font-weight="bold" fill="#4c1d95">258-dim Feature Vector</text>
+  <text x="270" y="346" text-anchor="middle" font-size="11" fill="#4c1d95">Hands (126) + Pose (132) · per frame</text>
+
+  <!-- ═══════════════════════ 7-CLASS RAW EMOTION ═══════════════════════ -->
+  <rect x="540" y="308" width="220" height="50" rx="8" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+  <text x="650" y="328" text-anchor="middle" font-size="13" font-weight="bold" fill="#9d174d">7-class Raw Emotion</text>
+  <text x="650" y="346" text-anchor="middle" font-size="11" fill="#9d174d">happy · sad · angry · fear · disgust ···</text>
+
+  <!-- features → buffer -->
+  <line x1="270" y1="358" x2="270" y2="386" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- raw emotion → bucketing -->
+  <line x1="650" y1="358" x2="650" y2="386" stroke="#db2777" stroke-width="1.5" marker-end="url(#arr-pink)"/>
+
+  <!-- ══════════════════════ 30-FRAME BUFFER ══════════════════════ -->
+  <rect x="155" y="386" width="230" height="50" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="270" y="406" text-anchor="middle" font-size="13" font-weight="bold" fill="#4c1d95">30-frame Rolling Buffer</text>
+  <text x="270" y="424" text-anchor="middle" font-size="11" fill="#4c1d95">X  ∈  ℝ³⁰ˣ²⁵⁸</text>
+
+  <!-- ══════════════════════ 3-CLASS BUCKETING ══════════════════════ -->
+  <rect x="540" y="386" width="220" height="50" rx="8" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+  <text x="650" y="406" text-anchor="middle" font-size="13" font-weight="bold" fill="#9d174d">3-class Bucketing</text>
+  <text x="650" y="424" text-anchor="middle" font-size="11" fill="#9d174d">positive · negative · neutral</text>
+
+  <!-- buffer → transformer -->
+  <line x1="270" y1="436" x2="270" y2="464" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- bucketing → smoothing -->
+  <line x1="650" y1="436" x2="650" y2="464" stroke="#db2777" stroke-width="1.5" marker-end="url(#arr-pink)"/>
+
+  <!-- ════════════════════ TRANSFORMER ENCODER ════════════════════ -->
+  <rect x="145" y="464" width="250" height="64" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="270" y="484" text-anchor="middle" font-size="13" font-weight="bold" fill="#4c1d95">Transformer Encoder</text>
+  <text x="270" y="500" text-anchor="middle" font-size="11" fill="#4c1d95">2 blocks · 8 heads · d_model = 64</text>
+  <text x="270" y="516" text-anchor="middle" font-size="11" fill="#4c1d95">GlobalMaxPool → Dropout(0.5) → Softmax</text>
+  <text x="270" y="530" text-anchor="middle" font-size="10" fill="#7c3aed">→ 151-class prediction</text>
+
+  <!-- ════════════════════ 6-FRAME SMOOTHING ════════════════════ -->
+  <rect x="540" y="464" width="220" height="50" rx="8" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+  <text x="650" y="484" text-anchor="middle" font-size="13" font-weight="bold" fill="#9d174d">6-frame History Buffer</text>
+  <text x="650" y="502" text-anchor="middle" font-size="11" fill="#9d174d">Majority voting · conf threshold ≥ 0.25</text>
+
+  <!-- transformer → confidence gate -->
+  <line x1="270" y1="528" x2="270" y2="558" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- smoothing → emotion output -->
+  <line x1="650" y1="514" x2="650" y2="542" stroke="#db2777" stroke-width="1.5" marker-end="url(#arr-pink)"/>
+
+  <!-- ════════════════════ EMOTION OUTPUT ════════════════════ -->
+  <rect x="540" y="542" width="220" height="50" rx="8" fill="#fce7f3" stroke="#db2777" stroke-width="2"/>
+  <text x="650" y="562" text-anchor="middle" font-size="13" font-weight="bold" fill="#9d174d">Emotion + Confidence</text>
+  <text x="650" y="580" text-anchor="middle" font-size="12" fill="#9d174d">😊 Positive  😐 Neutral  😞 Negative</text>
+
+  <!-- ══════════════════ CONFIDENCE GATE (diamond) ══════════════════ -->
+  <polygon points="270,558 345,592 270,626 195,592" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="270" y="587" text-anchor="middle" font-size="11" font-weight="bold" fill="#78350f">Confidence</text>
+  <text x="270" y="603" text-anchor="middle" font-size="11" font-weight="bold" fill="#78350f">≥  0.85 ?</text>
+
+  <!-- Confidence → Ignored (left branch) -->
+  <line x1="195" y1="592" x2="118" y2="592" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="155" y="584" text-anchor="middle" font-size="10" fill="#94a3b8">&lt; 0.85</text>
+  <rect x="40" y="568" width="78" height="48" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="79" y="589" text-anchor="middle" font-size="11" fill="#64748b">Ignored</text>
+  <text x="79" y="605" text-anchor="middle" font-size="10" fill="#94a3b8">cooldown</text>
+
+  <!-- Confidence → Router (down, yes) -->
+  <line x1="270" y1="626" x2="270" y2="656" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="278" y="646" font-size="10" fill="#64748b">≥ 0.85</text>
+
+  <!-- ══════════════════ SIGN TYPE ROUTER (diamond) ══════════════════ -->
+  <polygon points="270,656 355,692 270,728 185,692" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="270" y="686" text-anchor="middle" font-size="11" font-weight="bold" fill="#78350f">Sign</text>
+  <text x="270" y="703" text-anchor="middle" font-size="11" font-weight="bold" fill="#78350f">type?</text>
+
+  <!-- Router → letter branch (left) -->
+  <line x1="185" y1="692" x2="155" y2="692" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="155" y1="692" x2="155" y2="748" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="120" y="686" font-size="10" fill="#64748b" text-anchor="middle">letter</text>
+
+  <!-- Router → word branch (right) -->
+  <line x1="355" y1="692" x2="400" y2="692" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="400" y1="692" x2="400" y2="748" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="438" y="686" font-size="10" fill="#64748b">word</text>
+
+  <!-- ══════════════════ BANGLA COMPOSER ══════════════════ -->
+  <rect x="62" y="748" width="186" height="68" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="155" y="768" text-anchor="middle" font-size="13" font-weight="bold" fill="#065f46">BanglaComposer</text>
+  <text x="155" y="784" text-anchor="middle" font-size="11" fill="#065f46">consonant + vowel → matra</text>
+  <text x="155" y="798" text-anchor="middle" font-size="11" fill="#065f46">~ → virama (্)</text>
+  <text x="155" y="812" text-anchor="middle" font-size="10" fill="#065f46">space sign → word boundary</text>
+
+  <!-- ══════════════════ DIRECT APPEND ══════════════════ -->
+  <rect x="310" y="748" width="186" height="50" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="403" y="768" text-anchor="middle" font-size="13" font-weight="bold" fill="#065f46">Direct Append</text>
+  <text x="403" y="786" text-anchor="middle" font-size="11" fill="#065f46">word sign → sentence</text>
+
+  <!-- Composer → WordCorrector -->
+  <line x1="155" y1="816" x2="155" y2="844" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ══════════════════ WORD CORRECTOR ══════════════════ -->
+  <rect x="62" y="844" width="186" height="60" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="155" y="864" text-anchor="middle" font-size="13" font-weight="bold" fill="#065f46">WordCorrector</text>
+  <text x="155" y="880" text-anchor="middle" font-size="11" fill="#065f46">Tier 1: Levenshtein  (dist ≤ 2)</text>
+  <text x="155" y="895" text-anchor="middle" font-size="10" fill="#065f46">Tier 2: BanglaBERT fill-mask</text>
+
+  <!-- WordCorrector → Sentence -->
+  <line x1="155" y1="904" x2="155" y2="928" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="155" y1="928" x2="218" y2="928" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Direct Append → Sentence (route around) -->
+  <line x1="403" y1="798" x2="403" y2="928" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="403" y1="928" x2="348" y2="928" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ══════════════════ SENTENCE OUTPUT ══════════════════ -->
+  <rect x="218" y="906" width="130" height="50" rx="8" fill="#ffe4e6" stroke="#e11d48" stroke-width="1.5"/>
+  <text x="283" y="926" text-anchor="middle" font-size="13" font-weight="bold" fill="#9f1239">Sentence</text>
+  <text x="283" y="944" text-anchor="middle" font-size="11" fill="#9f1239">Bangla text output</text>
+
+  <!-- Sentence → UI -->
+  <line x1="283" y1="956" x2="283" y2="978" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="283" y1="978" x2="390" y2="978" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Emotion → UI (dashed pink) -->
+  <line x1="650" y1="592" x2="650" y2="978" stroke="#db2777" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <line x1="650" y1="978" x2="560" y2="978" stroke="#db2777" stroke-width="1.5" marker-end="url(#arr-pink)"/>
+  <text x="665" y="790" font-size="10" fill="#db2777">to UI</text>
+
+  <!-- ══════════════════════ PyQt5 UI BOX ══════════════════════ -->
+  <rect x="60" y="978" width="760" height="62" rx="12" fill="#f1f5f9" stroke="#475569" stroke-width="2"/>
+  <text x="440" y="998" text-anchor="middle" font-size="13" font-weight="bold" fill="#0f172a">PyQt5 Desktop Application</text>
+
+  <!-- UI sub-panels -->
+  <rect x="75"  y="1006" width="160" height="26" rx="5" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="155" y="1024" text-anchor="middle" font-size="11" font-weight="bold" fill="#1e40af">SENTENCE  —  Bangla text</text>
+
+  <rect x="248" y="1006" width="160" height="26" rx="5" fill="#d1fae5" stroke="#059669" stroke-width="1"/>
+  <text x="328" y="1024" text-anchor="middle" font-size="11" font-weight="bold" fill="#065f46">COMPOSING  —  letters</text>
+
+  <rect x="421" y="1006" width="180" height="26" rx="5" fill="#fce7f3" stroke="#db2777" stroke-width="1"/>
+  <text x="511" y="1024" text-anchor="middle" font-size="11" font-weight="bold" fill="#9d174d">EMOTION  —  😊 / 😐 / 😞 + %</text>
+
+  <rect x="614" y="1006" width="192" height="26" rx="5" fill="#f8fafc" stroke="#475569" stroke-width="1"/>
+  <text x="710" y="1024" text-anchor="middle" font-size="11" font-weight="bold" fill="#334155">WEBCAM  —  skeleton overlay</text>
+
+</svg>
