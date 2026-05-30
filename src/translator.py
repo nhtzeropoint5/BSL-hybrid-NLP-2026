@@ -174,8 +174,9 @@ class Translator:
 
         if kind == 'letter':
             if label == SPACE:
-                # 'space' sign explicitly signals a word boundary
+                # 'space' sign explicitly signals a word boundary + insert space
                 self._flush_composer()
+                self._sentence.append(' ')
             else:
                 self._composer.push(label)
 
@@ -186,16 +187,31 @@ class Translator:
         return label, conf, kind
 
     def get_sentence(self):
-        """Full sentence: committed words + any in-progress composed word."""
-        parts   = list(self._sentence)
-        partial = self._composer.peek()
-        if partial:
-            parts.append(partial)
-        return ' '.join(parts)
+        """Full sentence of committed words only."""
+        return ''.join(self._sentence)
 
     def get_composing(self):
         """Return the letter buffer currently being composed (for UI display)."""
         return self._composer.peek()
+
+    def delete_last_word(self):
+        """Delete one character at a time (composer first, then last committed word)."""
+        if self._composer.peek():
+            self._composer._buf = self._composer._buf[:-1]
+            # update last-was-consonant based on new tail
+            from src.sign_model import CONSONANTS
+            buf = self._composer._buf
+            self._composer._last_was_consonant = bool(buf) and buf[-1] in set(CONSONANTS) | {'ঞ'}
+        else:
+            # remove trailing space token first
+            while self._sentence and self._sentence[-1] == ' ':
+                self._sentence.pop()
+            if self._sentence:
+                last = self._sentence[-1]
+                if len(last) > 1:
+                    self._sentence[-1] = last[:-1]
+                else:
+                    self._sentence.pop()
 
     def clear(self):
         self._buffer.clear()

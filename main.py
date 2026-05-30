@@ -10,6 +10,11 @@ Run from the project root:
 """
 
 import sys
+
+# Must be imported before QApplication to avoid segfault on Windows
+import mediapipe  # noqa: F401
+import cv2        # noqa: F401
+
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore    import Qt
 from src.ui          import MainWindow

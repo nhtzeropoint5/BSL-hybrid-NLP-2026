@@ -22,6 +22,8 @@ import numpy as np
 _L_SHOULDER = 11
 _R_SHOULDER = 12
 
+_WHITE = (255, 255, 255)
+
 
 class HandPipeline:
     def __init__(self):
@@ -48,6 +50,19 @@ class HandPipeline:
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5,
         )
+        self._seg = mp.solutions.selfie_segmentation.SelfieSegmentation(
+            model_selection=1   # 1 = landscape model, more accurate
+        )
+
+    # ── background removal ────────────────────────────────────────────────────
+
+    def _remove_bg(self, frame):
+        """Replace background with white using MediaPipe Selfie Segmentation."""
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        result = self._seg.process(rgb)
+        mask = (result.segmentation_mask > 0.5).astype(np.uint8)
+        white = np.full_like(frame, 255)
+        return np.where(mask[:, :, np.newaxis], frame, white)
 
     # ── hand helpers ──────────────────────────────────────────────────────────
 
@@ -123,13 +138,14 @@ class HandPipeline:
         has_hands  : bool
         annotated  : BGR frame with hand + pose skeleton overlay
         """
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        clean = self._remove_bg(frame)
+        rgb = cv2.cvtColor(clean, cv2.COLOR_BGR2RGB)
         rgb.flags.writeable = False
         hand_results = self._hands.process(rgb)
         pose_results = self._pose.process(rgb)
         rgb.flags.writeable = True
 
-        annotated = frame.copy()
+        annotated = clean.copy()
         has_hands = bool(hand_results.multi_hand_landmarks)
 
         # draw hand skeletons

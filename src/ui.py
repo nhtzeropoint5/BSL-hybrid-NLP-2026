@@ -27,6 +27,11 @@ import sys
 import cv2
 import numpy as np
 
+from src.hand_pipeline import HandPipeline
+from src.face_pipeline import FacePipeline
+from src.sign_model    import SignModel
+from src.translator    import Translator
+
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget,
     QHBoxLayout, QVBoxLayout,
@@ -34,11 +39,6 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore  import QThread, pyqtSignal, Qt
 from PyQt5.QtGui   import QImage, QPixmap, QFont
-
-from src.hand_pipeline import HandPipeline
-from src.face_pipeline import FacePipeline
-from src.sign_model    import SignModel
-from src.translator    import Translator
 
 _ICON  = {'positive': '😊', 'negative': '😞', 'neutral': '😐'}
 _COLOR = {'positive': '#2ecc71', 'negative': '#e74c3c', 'neutral': '#f39c12'}
@@ -55,12 +55,13 @@ class VideoThread(QThread):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._running = True
-        self._hand    = HandPipeline()
-        self._face    = FacePipeline()
-        self._model   = SignModel()
-        self._trans   = Translator()
 
     def run(self):
+        self._hand  = HandPipeline()
+        self._face  = FacePipeline()
+        self._model = SignModel()
+        self._trans = Translator()
+
         cap = cv2.VideoCapture(0)
         cap.set(cv2.CAP_PROP_FRAME_WIDTH,  640)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -101,8 +102,13 @@ class VideoThread(QThread):
         self._running = False
         self.wait()
 
+    def delete_last_word(self):
+        if hasattr(self, '_trans'):
+            self._trans.delete_last_word()
+
     def clear_translation(self):
-        self._trans.clear()
+        if hasattr(self, '_trans'):
+            self._trans.clear()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -225,6 +231,19 @@ class MainWindow(QMainWindow):
         v.addWidget(emo_card)
         v.addStretch()
 
+        btn_row = QHBoxLayout()
+
+        backspace_btn = QPushButton("⌫ Backspace")
+        backspace_btn.setFont(QFont("Segoe UI", 10))
+        backspace_btn.setStyleSheet("""
+            QPushButton         { background:#1a4a7a; color:white; border:none;
+                                  border-radius:6px; padding:9px; }
+            QPushButton:hover   { background:#155a8a; }
+            QPushButton:pressed { background:#0f3a60; }
+        """)
+        backspace_btn.clicked.connect(self._delete_last_word)
+        btn_row.addWidget(backspace_btn)
+
         clear_btn = QPushButton("Clear")
         clear_btn.setFont(QFont("Segoe UI", 10))
         clear_btn.setStyleSheet("""
@@ -234,7 +253,9 @@ class MainWindow(QMainWindow):
             QPushButton:pressed { background:#922b21; }
         """)
         clear_btn.clicked.connect(self._clear)
-        v.addWidget(clear_btn)
+        btn_row.addWidget(clear_btn)
+
+        v.addLayout(btn_row)
 
         return sidebar
 
@@ -279,6 +300,9 @@ class MainWindow(QMainWindow):
         self.emo_text_lbl.setText(emotion.capitalize())
         self.emo_text_lbl.setStyleSheet(f"color: {color};")
         self.emo_conf_lbl.setText(f"Confidence: {conf:.0%}")
+
+    def _delete_last_word(self):
+        self._thread.delete_last_word()
 
     def _clear(self):
         self._thread.clear_translation()

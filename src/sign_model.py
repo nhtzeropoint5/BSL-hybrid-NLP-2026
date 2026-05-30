@@ -177,7 +177,48 @@ class SignModel:
             self.is_loaded = True
             print(f"[SignModel] Loaded from '{MODEL_PATH}'.")
         except Exception as exc:
-            print(f"[SignModel] Failed to load: {exc}")
+            print(f"[SignModel] Normal load failed ({exc}), trying weights-only fallback…")
+            self._load_weights_fallback()
+
+    def _load_weights_fallback(self):
+        """Rebuild architecture and load weights from h5 — works across Keras versions."""
+        try:
+            import tensorflow as tf
+            from tensorflow.keras import layers, Model
+
+            num_classes = len(SIGNS)
+            d_model, num_heads, ff_dim, num_blocks = 64, 8, 64, 2
+
+            inputs    = tf.keras.Input(shape=(SEQUENCE_LENGTH, FEATURES))
+            x         = layers.Dense(d_model)(inputs)
+            positions = tf.range(start=0, limit=SEQUENCE_LENGTH)
+            pos_emb   = layers.Embedding(input_dim=SEQUENCE_LENGTH, output_dim=d_model)(positions)
+            x         = x + pos_emb
+
+            for _ in range(num_blocks):
+                attn = layers.MultiHeadAttention(
+                    num_heads=num_heads,
+                    key_dim=d_model // num_heads,
+                    dropout=0.1,
+                )(x, x)
+                x = layers.LayerNormalization(epsilon=1e-6)(x + attn)
+                ff = layers.Dense(ff_dim, activation='gelu')(x)
+                ff = layers.Dense(d_model)(ff)
+                x  = layers.LayerNormalization(epsilon=1e-6)(x + ff)
+
+            x       = layers.GlobalMaxPooling1D()(x)
+            x       = layers.Dropout(0.5)(x)
+            x       = layers.Dense(d_model, activation='relu',
+                                   kernel_regularizer=tf.keras.regularizers.l2(0.01))(x)
+            outputs = layers.Dense(num_classes, activation='softmax')(x)
+
+            model = Model(inputs, outputs)
+            model.load_weights(MODEL_PATH)
+            self.model     = model
+            self.is_loaded = True
+            print(f"[SignModel] Loaded via weights fallback from '{MODEL_PATH}'.")
+        except Exception as exc:
+            print(f"[SignModel] Weights fallback also failed: {exc}")
 
     def predict(self, sequence):
         """

@@ -304,6 +304,36 @@ def main():
     split_label = 'signer-independent' if args.signer_split else 'random'
     print(f"\nTest accuracy ({split_label}) : {acc:.2%}")
     print(f"Model saved to               : {MODEL_PATH}")
+
+    # ── confusion matrix ──────────────────────────────────────────────────────
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    from sklearn.metrics import confusion_matrix, classification_report
+
+    y_pred = np.argmax(model.predict(X_te, verbose=0), axis=1)
+
+    # per-class report (precision / recall / F1) — printed to console
+    present = sorted(set(y_te))
+    present_labels = [SIGNS[i] for i in present]
+    print("\n" + classification_report(y_te, y_pred, labels=present, target_names=present_labels))
+
+    # full matrix as PNG
+    cm = confusion_matrix(y_te, y_pred, labels=present)
+    n  = len(present)
+    fig, ax = plt.subplots(figsize=(max(14, n // 4), max(12, n // 4)))
+    im = ax.imshow(cm, interpolation='nearest', cmap='Blues')
+    fig.colorbar(im, ax=ax)
+    ax.set_xticks(range(n)); ax.set_xticklabels(present_labels, rotation=90, fontsize=7)
+    ax.set_yticks(range(n)); ax.set_yticklabels(present_labels, fontsize=7)
+    ax.set_xlabel('Predicted'); ax.set_ylabel('True')
+    ax.set_title(f'Confusion Matrix — test acc {acc:.2%}')
+    fig.tight_layout()
+    cm_path = os.path.join('models', 'confusion_matrix.png')
+    fig.savefig(cm_path, dpi=120)
+    plt.close(fig)
+    print(f"Confusion matrix saved to    : {cm_path}")
+
     print("\nNext step:  python main.py")
 
 
